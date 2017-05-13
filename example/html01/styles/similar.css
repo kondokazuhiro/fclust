@@ -1,0 +1,44 @@
+.summary_table {
+    border-collapse: collapse;
+    padding: 2px;
+}
+
+.summary_table th {
+    background-color: #eee;
+    padding: 4px;
+    border: 1px solid #b9b9b9;
+}
+
+.summary_table td {
+    padding: 4px;
+    border: 1px solid #b9b9b9;
+}
+
+.int_number {
+    text-align: right;
+}
+
+.float_number {
+    text-align: right;
+}
+
+.detail_cluster_label {
+    margin: 12px 2px 2px 2px;
+}
+
+.detail_cluster_box {
+    margin: 2px 8px 8px 8px;
+    padding: 8px 8px 2px 8px;
+    border: 3px solid #222;
+    border-radius: 4px;
+}
+
+.detail_func_label {
+}
+
+.detail_func_box {
+    margin: 4px 8px 12px 8px;
+    padding: 2px 8px 2px 8px;
+    border:1px solid #444;
+    border-radius: 2px;
+}
