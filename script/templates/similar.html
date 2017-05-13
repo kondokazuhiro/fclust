@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Similar Definitions</title>
+  <link rel="stylesheet" type="text/css" href="styles/similar.css">
+  <link rel="stylesheet" type="text/css" href="google-code-prettify/atelier-estuary-light.css">
+  <script src="google-code-prettify/prettify.js"></script>
+</head>
+<body onload="prettyPrint()">
+
+<h1>Similar Definitions</h1>
+  
+<h2>Summary</h2>
+<p>
+  distance threshold: {{ "%f"|format(data.distance_threshold) }}
+</p>
+<table class="summary_table">
+  <tr>
+    <th>cluster</th>
+    <th>distance</th>
+    <th>represent</th>
+    <th>definition</th>
+    <th>path</th>
+    <th>from</th>
+    <th>to</th>
+  </tr>
+  {% for cluster in data.clusters %}
+  <tr>
+    <td class="int_number">
+      <a href="#{{ cluster.index }}">{{ cluster.index }}</a>
+    </td>
+    <td class="float_number">
+      {{ "%f"|format(cluster.distance) }}
+    </td>
+    <td class="int_number">
+      {{ cluster.represent }}
+    </td>
+    <td>
+      <code>
+      {% for elem in cluster.elements %}
+        <a href="#{{ elem.index }}">{{ elem.tag }}</a><br />
+      {% endfor %}
+      </code>
+    </td>
+    <td>
+      <code>
+      {% for elem in cluster.elements %}
+        {{ elem.path }}<br />
+      {% endfor %}
+      </code>
+    </td>
+    <td class="int_number">
+      <code>
+      {% for elem in cluster.elements %}
+        {{ elem.begin_line_num }}<br />
+      {% endfor %}
+      </code>
+    </td>
+    <td class="int_number">
+      <code>
+      {% for elem in cluster.elements %}
+        {{ elem.end_line_num }}<br />
+      {% endfor %}
+      </code>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<h2>Details</h2>
+  {% for cluster in data.clusters %}
+  <h3 class="detail_cluster_label">
+    <a name="{{ cluster.index }}">cluster [{{ cluster.index }}]
+      distance={{ "%f"|format(cluster.distance) }}
+      represent={{ cluster.represent }}</a>
+  </h3>
+
+  <div class="detail_cluster_box">
+    {% for elem in cluster.elements %}
+    <code class="detail_func_label">
+      <a name="{{ elem.index }}">[{{ elem.index }}] {{ elem.tag }}, {{ elem.path }}:{{ elem.begin_line_num }}-{{ elem.end_line_num }}</a>
+    </code>
+    <div class="detail_func_box">
+      <pre><code class="prettyprint linenums:{{ elem.begin_line_num }}"
+>{{ helper.get_source_content(elem) }}</code></pre>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+</body>
+</html>
