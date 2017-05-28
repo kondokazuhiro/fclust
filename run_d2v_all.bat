@@ -25,7 +25,6 @@ if not "%~3"=="" (
    goto %3
 )
 
-
 :0 run gtags in the target source dir.
 cd %FCLS_TARGET%
 if errorlevel 1 exit
@@ -47,8 +46,12 @@ if errorlevel 1 exit
 python tags_to_docs.py -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
-:4 clustering
-python cluster.py -o "%FCLS_RESULT%"
+:4-1 doc2vec training
+python doc2vec_train.py -o "%FCLS_RESULT%"
+if errorlevel 1 exit
+
+:4-2 doc2vec clustering
+python doc2vec_cluster.py -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
   REM make a dendrogram image (optional).
