@@ -62,7 +62,7 @@ def save_simple_text(out_file, data, src_accessor):
     cluster_sepalator = '=' * 76
     src_sepalator = '-' * 76
     
-    with open(out_file, 'w') as fl:
+    with open(out_file, 'w', encoding='utf-8') as fl:
         fl.write('Summary\n\n')
         fl.write('distance threshold: %f\n\n' % data['distance_threshold'])
         for cluster in data['clusters']:
