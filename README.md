@@ -51,7 +51,7 @@ Windows, Mac, Linux
 * sklearn
 * jinja2
 * matplotlib (optional; dendrogramの生成で使用)
-
+* gensim (doc2vecを使用する場合)
 
 ## 依存ソフトウェアのインストール
 
@@ -103,18 +103,32 @@ $ python --version
 Python 3.5.2 :: Anaconda 4.2.0 (64-bit)
 ```
 
+doc2vec を使用する場合は gensimパッケージをインストールします。
+
+```
+$ pip install gensim
+```
+
 ## 使い方
 
 コマンドラインから以下のように実行します。
 
-Windows
+**Windows**
 ```
-run_all.bat src_root result_dir
+run.bat src_root result_dir
+```
+または(doc2vecを使用する場合)
+```
+run-doc2vec.bat src_root result_dir
 ```
 
-Mac / Linux
+**Mac / Linux**
 ```
-sh run_all.sh src_root result_dir
+sh run.sh src_root result_dir
+```
+または(doc2vecを使用する場合)
+```
+sh run-doc2vec.sh src_root result_dir
 ```
 
 * `src_root`は入力対象となるソースファイルが納められたディレクトリです。
