@@ -53,7 +53,7 @@ def train_model(mode, sentences):
     print('begin train')
 
     # https://github.com/RaRe-Technologies/gensim/blob/develop/docs/notebooks/doc2vec-lee.ipynb
-    model.train(sentences, total_examples=model.corpus_count)
+    model.train(sentences, total_examples=model.corpus_count, epochs=model.iter)
 
         
 def parse_args():
