@@ -1,8 +1,8 @@
-# GNU GLOBALと自然言語処理ライブラリを利用して、似ている関数を見つける試み
+# GNU GLOBALと自然言語処理ライブラリを利用して、似ている関数を抽出する試み
 
 ソースコードタグシステム GNU GLOBAL と python の自然言語処置ライブラリを利用して、
 ソースファイル群から、互いにコード内容が似ている関数（メソッド／手続き）を
-簡単に抜き出せないかという試みです。
+抽出する試みです。
 
 * [出力例](https://kondokazuhiro.github.io/fclust/example/html01/similar.html)
 
