@@ -1,8 +1,8 @@
-# GNU GLOBAL を利用した類似関数抽出試行
+# GNU GLOBALと自然言語処理ライブラリを利用して、似ている関数を抽出する試み
 
-ソースコードタグシステム GNU GLOBAL と python ライブラリを利用して、
+ソースコードタグシステム GNU GLOBAL と python の自然言語処置ライブラリを利用して、
 ソースファイル群から、互いにコード内容が似ている関数（メソッド／手続き）を
-簡単に抜き出せないかという試みです。
+抽出する試みです。
 
 * [出力例](https://kondokazuhiro.github.io/fclust/example/html01/similar.html)
 
@@ -51,7 +51,7 @@ Windows, Mac, Linux
 * sklearn
 * jinja2
 * matplotlib (optional; dendrogramの生成で使用)
-
+* gensim (doc2vecを使用する場合)
 
 ## 依存ソフトウェアのインストール
 
@@ -103,18 +103,32 @@ $ python --version
 Python 3.5.2 :: Anaconda 4.2.0 (64-bit)
 ```
 
+doc2vec を使用する場合は gensimパッケージをインストールします。
+
+```
+$ pip install gensim
+```
+
 ## 使い方
 
 コマンドラインから以下のように実行します。
 
-Windows
+**Windows**
 ```
-run_all.bat src_root result_dir
+run.bat src_root result_dir
+```
+または(doc2vecを使用する場合)
+```
+run-doc2vec.bat src_root result_dir
 ```
 
-Mac / Linux
+**Mac / Linux**
 ```
-sh run_all.sh src_root result_dir
+sh run.sh src_root result_dir
+```
+または(doc2vecを使用する場合)
+```
+sh run-doc2vec.sh src_root result_dir
 ```
 
 * `src_root`は入力対象となるソースファイルが納められたディレクトリです。

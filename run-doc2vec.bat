@@ -5,8 +5,8 @@ if "%~2"=="" (
    echo usage: %~0 target_src_dir result_dir
    exit 1
 )
-if not "%~3"=="" (
-   echo error: extra argument: %3
+if not "%~4"=="" (
+   echo error: extra argument: %4
    exit 1
 )
 
@@ -19,8 +19,13 @@ REM this script dir.
 set FCLS_HOME=%~dp0
 set FCLS_SCRIPT=%FCLS_HOME%script
 
+if not "%~3"=="" (
+   cd %FCLS_SCRIPT%
+   if errorlevel 1 exit
+   goto %3
+)
 
-REM (0) run gtags in the target source dir.
+:0 run gtags in the target source dir.
 cd %FCLS_TARGET%
 if errorlevel 1 exit
 gtags
@@ -29,30 +34,34 @@ if errorlevel 1 exit
 cd %FCLS_SCRIPT%
 if errorlevel 1 exit
 
-REM (1) make target source file list.
+:1 make target source file list.
 python gl_target_list.py "%FCLS_TARGET%" -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
-REM (2) extract tags(definitions, references, symbols)
+:2 extract tags(definitions, references, symbols)
 python gl_extract_tags.py "%FCLS_TARGET%" -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
-REM (3) make document-set from extracted tags.
+:3 make document-set from extracted tags.
 python tags_to_docs.py -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
-REM (4) clustering
-python cluster.py -o "%FCLS_RESULT%"
+:4-1 doc2vec training
+python doc2vec_train.py -o "%FCLS_RESULT%"
+if errorlevel 1 exit
+
+:4-2 doc2vec clustering
+python doc2vec_cluster.py -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
   REM make a dendrogram image (optional).
   python dendrogram.py -o "%FCLS_RESULT%"
 
-REM (5) resolve similar functions/definitions.
+:5 resolve similar functions/definitions.
 python resolve_similar.py -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
-REM (6) make html.
+:6 make html.
 python make_html.py -s "%FCLS_TARGET%" -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
