@@ -20,13 +20,20 @@ def clustering(pdists):
     return scipy.cluster.hierarchy.linkage(pdists, method='ward')
 
 
-def compute_pdists_in_docs(docs):
+def compute_pdists_in_docs(docs, length_ratio_threshold=None):
     pdists = []
     n = len(docs)
     for j in range(n-1):
         for i in range(j+1, n):
-            sm = edit_distance.SequenceMatcher(a=docs[j], b=docs[i])
-            ratio = sm.distance() * 2 / (len(docs[j]) + len(docs[i]))
+            len_i = len(docs[i])
+            len_j = len(docs[j])
+            len_ratio = min(len_i, len_j) / max(len_i, len_j)
+            if (length_ratio_threshold is not None
+                and len_ratio < length_ratio_threshold):
+                ratio = 1.0
+            else:
+                sm = edit_distance.SequenceMatcher(a=docs[j], b=docs[i])
+                ratio = sm.distance() * 2 / (len_j + len_i)
             pdists.append(ratio)
     return pdists
 
@@ -53,6 +60,8 @@ def parse_args():
                         help='input documents file')
     parser.add_argument('--out-dir', '-o', default=Const.RESULT_DIR,
                         help='output dir')
+    parser.add_argument('--length-ratio-threshold', '-r', default=None,
+                        type=float, help='length ratio threshold')
 
     return parser.parse_args()
 
@@ -63,7 +72,7 @@ if __name__ == '__main__':
     docs_file = resolve_io_path(conf, conf.docs_file, Const.DOCS_FNAME)
     docs = read_docs_as_matrix(docs_file)
 
-    pdists = compute_pdists_in_docs(docs)
+    pdists = compute_pdists_in_docs(docs, conf.length_ratio_threshold)
     linkage_mat = clustering(pdists)
     
     np.savetxt(os.path.join(conf.out_dir, Const.LINKAGE_MAT_FNAME),
