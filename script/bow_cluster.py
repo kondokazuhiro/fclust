@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 '''
-BOW with clustering.
+BOW clustering.
 '''
 
 import os
@@ -32,7 +32,7 @@ def normalize(np_vectors):
 
 
 def docs_to_vectors(docs, tfidf):
-    if conf.tfidf:
+    if tfidf:
         vectorizer = TfidfVectorizer(use_idf=True, token_pattern=r'[^\s]+')
         sp_vectors = vectorizer.fit_transform(docs)
         vectors = sp_vectors.toarray()

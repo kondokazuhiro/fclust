@@ -1,4 +1,4 @@
-# GNU GLOBALと自然言語処理ライブラリを利用して、似ている関数を抽出する試み
+# GNU GLOBALと自然言語処理ライブラリを利用し、類似関数を抽出する試み
 
 ソースコードタグシステム GNU GLOBAL と python の自然言語処置ライブラリを利用して、
 ソースファイル群から、互いにコード内容が似ている関数（メソッド／手続き）を
@@ -9,26 +9,35 @@
 おおまかには以下のような処理手順になっています。
 
 * GNU GLOBAL を利用し、ソースファイル群からタグ情報(definition / reference / symbol)を抽出。
-* タグ情報から、definition ごとに reference と symbol を word とした
-  BoW(Bag of Words; 識別子の出現頻度) / 特徴ベクトルを作成。
-* 特徴ベクトルをクラスタリング（階層型クラスタリング / ウォード法）。
-* ベクトル同士の距離が近い definition を選択し、結果をHTMLとして提示。
+* タグ情報より、definition(関数)を文書、reference と symbol を文書中のワードとして文書集合を作成(文書=関数, 文書集合=関数集合)。
+* 文書集合中の文書ごとに、文書の特徴を表現するベクトルを作成する。  
+  ベクトルとして以下のバリエーションがある。
+  * BoW(Bag of Words)
+  * doc2vec
+* ベクトルをクラスタリング（階層型クラスタリング / ウォード法）。
+* ベクトル同士の距離が近い definition(関数)を選択し、結果をHTMLとして提示。
 
 GNU GLOBAL の definition には、関数定義の他、変数定義、構造体定義、クラス定義
 なども含まれますが、reference / symbol の数が一定以上ある definition のみに
 絞ることで、概ね関数定義に絞られるようにしています。
 
+## 編集距離による方法
+
+比較のため、自然言語処理ではない方法として、編集距離(edit distance)による
+類似関数抽出も実装しています。
+文書ごとのベクトルを作成する代わりに、文書をワードシーケンスとみなし、
+ワードシーケンス間で編集距離を計算し、編集距離でクラスタリングするようになっています。
 
 ## 対応言語
 
 基本的に GNU GLOBAL が対応している言語は概ね対応可能と思われます。
 ただし、対象ファイルを取り込む部分で、以下の拡張子のみに制限しています。
 
-* Java (*.java)
-* C (*.c)
-* C++ (*.cpp, *.cxx, *.cc, *.c++)
+* Java: `*.java`
+* C: `*.c`
+* C++: `*.cpp, *.cxx, *.cc, *.c++`
 
-拡張子パターン定数(analysis_const.py:TARGET_FNAME_PATTERN)を修正すれば、
+拡張子パターン定数(analysis_const.py  TARGET_FNAME_PATTERN)を修正すれば、
 他のファイルも取り込めそうですが未確認です。
 
 
@@ -52,6 +61,7 @@ Windows, Mac, Linux
 * jinja2
 * matplotlib (optional; dendrogramの生成で使用)
 * gensim (doc2vecを使用する場合)
+* edit_distance (編集距離を使用する場合)
 
 ## 依存ソフトウェアのインストール
 
@@ -109,26 +119,44 @@ doc2vec を使用する場合は gensimパッケージをインストールし�
 $ pip install gensim
 ```
 
+編集距離を使用する場合は edit_distanceパッケージをインストールします。
+
+```
+$ pip install edit_distance
+```
+
 ## 使い方
 
 コマンドラインから以下のように実行します。
 
 **Windows**
+
+BoW を使用する場合
 ```
-run.bat src_root result_dir
+run-bow.bat src_root result_dir
 ```
-または(doc2vecを使用する場合)
+doc2vecを使用する場合
 ```
 run-doc2vec.bat src_root result_dir
 ```
+編集距離を使用する場合
+```
+run-edist.bat src_root result_dir
+```
 
 **Mac / Linux**
+
+BoW を使用する場合
 ```
-sh run.sh src_root result_dir
+sh run-bow.sh src_root result_dir
 ```
-または(doc2vecを使用する場合)
+doc2vecを使用する場合
 ```
 sh run-doc2vec.sh src_root result_dir
+```
+編集距離を使用する場合
+```
+sh run-edist.sh src_root result_dir
 ```
 
 * `src_root`は入力対象となるソースファイルが納められたディレクトリです。

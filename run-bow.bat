@@ -48,7 +48,7 @@ python tags_to_docs.py -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
 :4 clustering
-python cluster.py -o "%FCLS_RESULT%"
+python bow_cluster.py -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
   REM make a dendrogram image (optional).
