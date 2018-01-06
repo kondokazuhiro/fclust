@@ -11,7 +11,7 @@ import argparse
 from gensim import models
 from gensim.models.doc2vec import LabeledSentence
 
-from analysis_const_draft import ConstDraft
+from doc2vec_common import Doc2VecConst
 from analysis_const import Const
 import analysis_common as common
 
@@ -91,4 +91,4 @@ if __name__ == '__main__':
 
     train_model(model, sentences)
     
-    model.save(os.path.join(conf.out_dir, ConstDraft.DOC2VEC_MODEL_FNAME))
+    model.save(os.path.join(conf.out_dir, Doc2VecConst.MODEL_FNAME))

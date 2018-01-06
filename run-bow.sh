@@ -33,7 +33,7 @@ echo "(3) make document-set from extracted tags."
 python "$FCLS_SCRIPT/tags_to_docs.py" -o "$FCLS_RESULT" || _err
 
 echo "(4) clustering"
-python "$FCLS_SCRIPT/cluster.py" -o "$FCLS_RESULT" || _err
+python "$FCLS_SCRIPT/bow_cluster.py" -o "$FCLS_RESULT" || _err
 
 echo "make a dendrogram image (optional)."
 python "$FCLS_SCRIPT/dendrogram.py" -o "$FCLS_RESULT"

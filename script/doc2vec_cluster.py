@@ -13,7 +13,7 @@ import scipy.spatial.distance
 from gensim import models
 from gensim.models.doc2vec import LabeledSentence
 
-from analysis_const_draft import ConstDraft
+from doc2vec_common import Doc2VecConst
 from analysis_const import Const
 import analysis_common as common
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     conf = parse_args()
 
     model_file = resolve_io_path(
-        conf, conf.model_file, ConstDraft.DOC2VEC_MODEL_FNAME)
+        conf, conf.model_file, Doc2VecConst.MODEL_FNAME)
     model = models.Doc2Vec.load(model_file)
 
     vectors = [model.docvecs[i]  for i in range(len(model.docvecs))]
