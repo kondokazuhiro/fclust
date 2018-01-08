@@ -30,7 +30,7 @@ echo "(2) extract tags(definitions, references, symbols)"
 python "$FCLS_SCRIPT/gl_extract_tags.py" "$FCLS_TARGET" -o "$FCLS_RESULT" || _err
 
 echo "(3) make document-set from extracted tags."
-python "$FCLS_SCRIPT/tags_to_docs.py" -o "$FCLS_RESULT" || _err
+python "$FCLS_SCRIPT/tags_to_docs.py" --by-file -o "$FCLS_RESULT" || _err
 
 echo "(4-1) doc2vec training"
 python "$FCLS_SCRIPT/doc2vec_train.py" -o "$FCLS_RESULT" || _err

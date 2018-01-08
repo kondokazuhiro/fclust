@@ -12,16 +12,19 @@ class Const:
     SOURCE_ENCODING = 'utf-8'
 
     # 定義内の参照数最小値(これ未満は処理対象外)
-    MIN_REFS_PER_DEF = 30
+    MIN_REFS_PER_DEF = 0
 
     # 統合するシンボル長(これ以下は UNIFIED_SYM_WORD に置換).
-    UNIFIED_SYM_LENGTH = 0
+    UNIFIED_SYM_LENGTH = 2
 
     # 統合対象シンボルのワード.
     UNIFIED_SYM_WORD = '0_'
 
-    # クラスタリング結果から抽出する linkage 数(default).
-    DEFAULT_NUM_OF_LINKAGES = 50
+    # クラスタリング結果から抽出するクラスタ数(default).
+    DEFAULT_NUM_OF_CLUSTERS = 10
+
+    # (DEPRECATED)クラスタリング結果から抽出する linkage 数.
+    DEFAULT_NUM_OF_LINKAGES = None
 
     # ラベル内フィールドの区切り文字.
     LABEL_FIELD_DELIMITER = '\t'

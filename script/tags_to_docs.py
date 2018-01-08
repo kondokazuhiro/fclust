@@ -97,6 +97,12 @@ class SourceFile:
                 del self._def_dic[de.tag]
         self.commit_defs()
 
+    def head_line_num(self):
+        return self._defs[0].line_num if len(self._defs) > 0 else 0
+        
+    def tail_line_num(self):
+        return self._defs[-1].tail_line_num() if len(self._defs) > 0 else 0
+
 
 class SourceBundle:
 
@@ -161,6 +167,22 @@ class SourceBundle:
                     words = [r.word for r in de.get_refs()]
                     fl.write(Const.DOC_WORD_DELIMITER.join(words) + '\n')
 
+    def save_labels_by_file(self, out_file):
+        with open(out_file, 'w') as fl:
+            for src in self._srcs:
+                fields = [src.name, '_',
+                          str(src.head_line_num()), str(src.tail_line_num())]
+                fl.write(Const.LABEL_FIELD_DELIMITER.join(fields) + '\n')
+
+    def save_docs_by_file(self, out_file):
+        with open(out_file, 'w') as fl:
+            for src in self._srcs:
+                words = []
+                for de in src.get_defs():
+                    words.append(de.tag)
+                    words.extend([r.word for r in de.get_refs()])
+                fl.write(Const.DOC_WORD_DELIMITER.join(words) + '\n')
+
     def save_debug(self, out_file):
         with open(out_file, 'w') as fl:
             for src in self._srcs:
@@ -191,6 +213,8 @@ def parse_args():
                         help='input symbol tags file')
     parser.add_argument('--out-dir', '-o', default=Const.RESULT_DIR,
                         help='output dir')
+    parser.add_argument('--by-file', action='store_true', default=False,
+                        help='a document corresponds to a source file.')
 
     return parser.parse_args()
 
@@ -207,6 +231,12 @@ if __name__ == '__main__':
 
     if not os.path.exists(conf.out_dir):
         os.mkdir(conf.out_dir)
-    bundle.save_labels(os.path.join(conf.out_dir, Const.LABELS_FNAME))
-    bundle.save_docs(os.path.join(conf.out_dir, Const.DOCS_FNAME))
+
+    if conf.by_file:
+        bundle.save_labels_by_file(os.path.join(conf.out_dir, Const.LABELS_FNAME))
+        bundle.save_docs_by_file(os.path.join(conf.out_dir, Const.DOCS_FNAME))
+    else:
+        bundle.save_labels(os.path.join(conf.out_dir, Const.LABELS_FNAME))
+        bundle.save_docs(os.path.join(conf.out_dir, Const.DOCS_FNAME))
+
     bundle.save_debug(os.path.join(conf.out_dir, Const.DEBUG_FUNCS_FNAME))

@@ -44,7 +44,7 @@ python gl_extract_tags.py "%FCLS_TARGET%" -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
 :3 make document-set from extracted tags.
-python tags_to_docs.py -o "%FCLS_RESULT%"
+python tags_to_docs.py --by-file -o "%FCLS_RESULT%"
 if errorlevel 1 exit
 
 :4 clustering

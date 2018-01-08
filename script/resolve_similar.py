@@ -39,9 +39,24 @@ def make_similar_data(root_node, similar_distance, info_accessor):
     return data
 
 
-def resolve_similar_distance(linkage_mat, num_of_linkages):
+def distance_by_nclusters(linkage_mat, num_of_clusters):
+    # linkage_mat[i] ::= cluster_a, cluster_b, distance, represent
+    #                    [i][0],    [i][1],    [i][2],   [i][3]
+    link_len = len(linkage_mat)
+    if link_len < num_of_clusters:
+        return linkage_mat[0][2]
+    return linkage_mat[link_len - num_of_clusters][2]
+
+
+def distance_by_nlinkages(linkage_mat, num_of_linkages):
     index = min(num_of_linkages - 1, len(linkage_mat)-1)
     return linkage_mat[index][2]
+
+
+def resolve_similar_distance(linkage_mat, conf):
+    if conf.num_of_linkages is not None:
+        return distance_by_nlinkages(linkage_mat, conf.num_of_linkages)
+    return distance_by_nclusters(linkage_mat, conf.num_of_clusters)
 
 
 def resolve_io_path(conf, path, default_fname):
@@ -59,9 +74,14 @@ def parse_args():
                         help="input linkage file")
     parser.add_argument('--out-dir', '-o', default=Const.RESULT_DIR,
                         help="output dir")
-    parser.add_argument('--num-of-linkages', type=int,
-                        default=Const.DEFAULT_NUM_OF_LINKAGES,
-                        help='number of linkages')
+
+    cls_group = parser.add_mutually_exclusive_group(required=False)
+    cls_group.add_argument('--num-of-clusters', type=int,
+                           default=Const.DEFAULT_NUM_OF_CLUSTERS,
+                           help='number of clusters')
+    cls_group.add_argument('--num-of-linkages', type=int,
+                           default=Const.DEFAULT_NUM_OF_LINKAGES,
+                           help='number of linkages')
 
     return parser.parse_args()
 
@@ -76,11 +96,11 @@ if __name__ == '__main__':
     linkage_file = resolve_io_path(conf, conf.linkage_file, Const.LINKAGE_MAT_FNAME)
     linkage_mat = np.loadtxt(linkage_file, delimiter=Const.LINKAGE_MAT_DELIMITER)
 
-    similar_distance = resolve_similar_distance(linkage_mat, conf.num_of_linkages)
+    distance = resolve_similar_distance(linkage_mat, conf)
 
     root_node = common.ClusterNode.build_hierarchy(linkage_mat)
 
-    similar_data = make_similar_data(root_node, similar_distance, info_accessor)
+    similar_data = make_similar_data(root_node, distance, info_accessor)
     similar_file = os.path.join(conf.out_dir, Const.SIMILAR_PKL_FNAME)
     with open(similar_file, 'wb') as fl:
         pickle.dump(similar_data, fl)
