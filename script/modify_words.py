@@ -26,22 +26,22 @@ def split_word(word: str) -> list:
     # ex. __Camel_Case__ -> Camel_Case__
     snake = re.sub('^_+', '', snake)
     # ex. Camel_Case__ -> Camel_Case
-    snake = re.sub('_+$', '', snake)
-    # ex. ['Camel', 'Case']
+    snake = re.sub('_+$', '', snake.lower())
+    # ex. ['camel', 'case']
     return re.split('_+', snake)
 
-def modify_words(in_words: list) -> list:
+def modify_words(in_words: list, min_length: int) -> list:
     out_words = []
     for word in in_words:
         words = split_word(word)
         out_words.extend(words)
-    return out_words
+    return [w for w in out_words if len(w) >= min_length]
 
 
-def modify_docs_with_save(out_file, docs):
+def modify_docs_with_save(out_file, docs, min_length):
     with open(out_file, 'w') as fl:
         for words in docs:
-            fl.write(' '.join(modify_words(words)))
+            fl.write(' '.join(modify_words(words, min_length)))
             fl.write('\n')
                
 
@@ -72,4 +72,4 @@ if __name__ == '__main__':
     in_docs_file = resolve_io_path(conf, conf.docs_file, Const.DOCS_FNAME)
     out_docs_file = resolve_io_path(conf, conf.out_docs_file, Const.DOCS_FNAME)
     docs = read_docs_as_matrix(in_docs_file)
-    modify_docs_with_save(out_docs_file, docs)
+    modify_docs_with_save(out_docs_file, docs, conf.min_length)

@@ -23,6 +23,14 @@ def read_docs_as_matrix(docs_file):
     return docs
 
 
+def read_src_names(labels_file):
+    lines = []
+    with open(labels_file) as fl:
+        for line in fl:
+            lines.append(line.split('\t')[0].strip())
+    return lines
+
+
 def resolve_io_path(conf, path, default_fname):
     if path is not None:
         return path
@@ -44,10 +52,13 @@ class LdaWorker:
         self._dictionary = None
         self.num_topics = None
         self._corpus = None
+        self._labels = None
         self._with_ldavis = with_ldavis
  
-    def load_docs(self, docs_file):
+    def load_docs(self, docs_file, labels_file):
         docs = read_docs_as_matrix(docs_file)
+        self._labels = read_src_names(labels_file)
+
         self._dictionary = Dictionary(docs)
 
         # Transforming corpus with dictionary.
@@ -75,9 +86,9 @@ class LdaWorker:
     def save_info(self, out_dir):
         model = self._lda
         
-        # 文書ごとトピック分布をCSV出力
+        # 文書ごとのトピック分布をCSV出力
         topic_dist_per_doc = [dict(model[bow]) for bow in self._corpus]
-        pandas.DataFrame(topic_dist_per_doc).to_csv(
+        pandas.DataFrame(topic_dist_per_doc, index=self._labels).to_csv(
             os.path.join(out_dir, "topic_dist_per_doc.csv"))
 
         # トピックごとの単語分布（上位10語）をCSV出力
@@ -109,13 +120,15 @@ def parse_args():
 
 if __name__ == '__main__':
     conf = parse_args()
+
     docs_file = resolve_io_path(conf, conf.docs_file, Const.DOCS_FNAME)
+    labels_file = resolve_io_path(conf, conf.labels_file, Const.LABELS_FNAME)
 
     if not os.path.exists(conf.out_dir):
         os.mkdir(conf.out_dir)
 
     worker = LdaWorker(with_ldavis=conf.with_ldavis)
-    worker.load_docs(docs_file)
+    worker.load_docs(docs_file, labels_file)
     
     worker.init_model(conf.num_topics)
     
