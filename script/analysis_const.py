@@ -15,7 +15,7 @@ class Const:
     MIN_REFS_PER_DEF = 0
 
     # 統合するシンボル長(これ以下は UNIFIED_SYM_WORD に置換).
-    UNIFIED_SYM_LENGTH = 2
+    UNIFIED_SYM_LENGTH = 0
 
     # 統合対象シンボルのワード.
     UNIFIED_SYM_WORD = '0_'

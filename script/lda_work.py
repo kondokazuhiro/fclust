@@ -8,9 +8,10 @@ import gensim
 from gensim.models import LdaModel
 from gensim.models import TfidfModel
 from gensim.corpora.dictionary import Dictionary
-
 import pyLDAvis.gensim
 import pandas
+
+from analysis_const import Const
 
 
 def read_docs_as_matrix(docs_file):
@@ -28,7 +29,7 @@ def resolve_io_path(conf, path, default_fname):
     return os.path.join(conf.out_dir, default_fname)
 
 
-def convert_corpus_by_tfidf(tfidf, corpus):
+def ldaviz_convert_corpus_by_tfidf(tfidf: TfidfModel, corpus: list) -> list:
     '''for LDAViz convert freq to int'''
     def modify_bow(bow):
         return [(pair[0], int(pair[1] * 1000)) for pair in bow]
@@ -38,11 +39,12 @@ def convert_corpus_by_tfidf(tfidf, corpus):
 
 class LdaWorker:
 
-    def __init__(self):
+    def __init__(self, with_ldavis=False):
         self._lda = None
         self._dictionary = None
         self.num_topics = None
         self._corpus = None
+        self._with_ldavis = with_ldavis
  
     def load_docs(self, docs_file):
         docs = read_docs_as_matrix(docs_file)
@@ -52,10 +54,13 @@ class LdaWorker:
         self._corpus = [self._dictionary.doc2bow(doc) for doc in docs]
 
         tfidf = gensim.models.TfidfModel(self._corpus)
-        #self._corpus = tfidf[self._corpus]
-        self._corpus = convert_corpus_by_tfidf(tfidf, self._corpus)
+
+        if self._with_ldavis:
+            self._corpus = ldaviz_convert_corpus_by_tfidf(tfidf, self._corpus)
+        else:
+            self._corpus = tfidf[self._corpus]
  
-    def init_model(self, num_topics):
+    def init_model(self, num_topics: int) -> None:
         self._lda = LdaModel(corpus=self._corpus,
                              id2word=self._dictionary,
                              num_topics=num_topics)
@@ -63,9 +68,8 @@ class LdaWorker:
     def save_model(self, out_file):
         self._lda.save(out_file)
      
-    def save_html(self, out_file):
-        lda = self._lda
-        data = pyLDAvis.gensim.prepare(lda, self._corpus, self._dictionary)
+    def save_html_by_ldavis(self, out_file):
+        data = pyLDAvis.gensim.prepare(self._lda, self._corpus, self._dictionary)
         pyLDAvis.save_html(data, out_file)
 
     def save_info(self, out_dir):
@@ -97,21 +101,26 @@ def parse_args():
                         default=20, help='number of topics')
     parser.add_argument('--out-dir', '-o', required=True,
                         help='output dir')
+    parser.add_argument('--with-ldavis', action='store_true',
+                        default=False, help='output LDAVis html')
     
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     conf = parse_args()
+    docs_file = resolve_io_path(conf, conf.docs_file, Const.DOCS_FNAME)
 
     if not os.path.exists(conf.out_dir):
         os.mkdir(conf.out_dir)
 
-    worker = LdaWorker()
-    worker.load_docs(conf.docs_file)
+    worker = LdaWorker(with_ldavis=conf.with_ldavis)
+    worker.load_docs(docs_file)
     
     worker.init_model(conf.num_topics)
     
     worker.save_model(os.path.join(conf.out_dir, 'lda_model'))
     worker.save_info(conf.out_dir)
-    worker.save_html(os.path.join(conf.out_dir, 'dist.html'))
+
+    if conf.with_ldavis:
+        worker.save_html_by_ldavis(os.path.join(conf.out_dir, "ldavis.html"))
