@@ -9,7 +9,7 @@ from gensim.models import LdaModel
 from gensim.models import TfidfModel
 from gensim.corpora.dictionary import Dictionary
 import pyLDAvis.gensim
-import pandas
+import pandas as pd
 
 from analysis_const import Const
 
@@ -87,16 +87,30 @@ class LdaWorker:
         model = self._lda
         
         # 文書ごとのトピック分布をCSV出力
-        topic_dist_per_doc = [dict(model[bow]) for bow in self._corpus]
-        pandas.DataFrame(topic_dist_per_doc, index=self._labels).to_csv(
-            os.path.join(out_dir, "topic_dist_per_doc.csv"))
+        topics_per_doc = [
+            # list of (int, float) – Topic distribution for the whole document.
+            # Each element in the list is a pair of a topic’s id,
+            # and the probability that was assigned to it.
+            dict(model.get_document_topics(bow)) for bow in self._corpus]
+        pd.DataFrame(topics_per_doc, index=self._labels).to_csv(
+            os.path.join(out_dir, "topics_per_doc.csv"))
 
-        # トピックごとの単語分布（上位10語）をCSV出力
+        # トピックごとの単語分布（上位30語）をCSV出力
+        df = pd.DataFrame()
+        for topic_id in range(model.num_topics):
+            # [(WordID, probability)...]
+            topic_terms = model.get_topic_terms(topic_id, topn=30)
+            col_term = '%d_word' % topic_id
+            col_prob = '%d_prob' % topic_id
+            df[col_term] = [model.id2word[wid] for wid, _ in topic_terms]
+            df[col_prob] = [prob for _, prob in topic_terms]
+        df.to_csv(os.path.join(out_dir, "topic_words.csv"), index=False)
+
         # Sequence with (topic_id, [(word, value), … ]).
         # list of (int, list of (str, float))
-        topicdata = model.print_topics(num_topics=-1, num_words=10)
-        pandas.DataFrame(topicdata).to_csv(
-            os.path.join(out_dir, "topic_detail.csv"))
+        #topicdata = model.print_topics(num_topics=-1, num_words=30)
+        #pd.DataFrame(topicdata).to_csv(
+        #    os.path.join(out_dir, "topic_detail.csv"))
 
         print('num_topics=%d' % model.num_topics)
 
@@ -109,7 +123,7 @@ def parse_args():
     parser.add_argument('--labels-file', '-l', default=None,
                         help="input labels file")
     parser.add_argument('--num-topics', '-n', type=int,
-                        default=20, help='number of topics')
+                        default=10, help='number of topics')
     parser.add_argument('--out-dir', '-o', required=True,
                         help='output dir')
     parser.add_argument('--with-ldavis', action='store_true',
