@@ -38,5 +38,10 @@ python "$FCLS_SCRIPT/modify_words.py" -o "$FCLS_RESULT" || _err
 echo "(5) LDA."
 python "$FCLS_SCRIPT/lda_work.py" --with-ldavis -o "$FCLS_RESULT" || _err
 
+echo "(6) clustering"
+python "$FCLS_SCRIPT/lda_cluster.py" "$FCLS_RESULT/doc_topic_matrix.csv" -o "$FCLS_RESULT" || _err
+
+echo "make a dendrogram image (optional)."
+python "$FCLS_SCRIPT/dendrogram.py" -o "$FCLS_RESULT"
 
 echo 'successful.'

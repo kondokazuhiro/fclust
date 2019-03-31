@@ -92,8 +92,10 @@ class LdaWorker:
             # Each element in the list is a pair of a topic’s id,
             # and the probability that was assigned to it.
             dict(model.get_document_topics(bow)) for bow in self._corpus]
-        pd.DataFrame(topics_per_doc, index=self._labels).to_csv(
-            os.path.join(out_dir, "topics_per_doc.csv"))
+        df = pd.DataFrame(topics_per_doc, index=self._labels)
+        df.to_csv(os.path.join(out_dir, "topics_per_doc.csv"))
+        df.fillna(0).to_csv(os.path.join(out_dir, "doc_topic_matrix.csv"),
+            header=False, index=False)
 
         # トピックごとの単語分布（上位30語）をCSV出力
         df = pd.DataFrame()
